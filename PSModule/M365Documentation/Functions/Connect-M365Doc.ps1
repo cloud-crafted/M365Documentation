@@ -96,6 +96,7 @@ Function Connect-M365Doc(){
                 TenantId = $TenantId
                 ClientSecret = $ClientSecret
                 Authority = $selectedCloud.Authority + $TenantId
+                Scopes = @($selectedCloud.GraphEndpoint + ".default")
                 ForceRefresh = $True # We could be pulling a token from the MSAL Cache, ForceRefresh to ensure it's new and has the longest timeline.
             }
             if($NeverRefreshToken) { $script:tokenRequest.ForceRefresh = $False}
@@ -107,6 +108,8 @@ Function Connect-M365Doc(){
                 Write-Error "Connection failed."
             }
             Write-Verbose "PublicClient-Silent Token expires: $($script:token.ExpiresOn.LocalDateTime)"
+            Write-Verbose "Token scopes: $($script:token.Scopes -join ', ')"
+            Write-Verbose "Token audience: $($script:token.Account)"
             break
         }
        "Interactive" {
@@ -115,6 +118,7 @@ Function Connect-M365Doc(){
                 ClientId    = "37f82fa9-674e-4cae-9286-4b21eb9a6389"
                 RedirectUri = "http://localhost"
                 Authority   = $selectedCloud.Authority + "common"
+                Scopes     = @($selectedCloud.GraphEndpoint + ".default")
                 ForceRefresh = $True # We could be pulling a token from the MSAL Cache, ForceRefresh to ensure it's new and has the longest timeline.
             }
 
@@ -132,6 +136,8 @@ Function Connect-M365Doc(){
                 }
             }
             Write-Verbose "Interactive Token expires: $($script:token.ExpiresOn.LocalDateTime)"
+            Write-Verbose "Token scopes: $($script:token.Scopes -join ', ')"
+            Write-Verbose "Token audience: $($script:token.Account)"
             break
        }
    }

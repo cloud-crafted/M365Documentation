@@ -24,14 +24,28 @@ function Test-TokenExpiration {
     if($script:token -and $script:tokenRequest.ClientSecret) {
         # Using PublicClient-Silent
         try {
-            Connect-M365Doc -ClientId $script:tokenRequest.ClientId -ClientSecret $script:tokenRequest.ClientSecret -TenantId $script:tokenRequest.TenantId -Verbose
+            # Determine cloud environment from stored cloud endpoints
+            $cloud = 'Commercial'
+            if ($script:CloudEndpoints) {
+                if ($script:CloudEndpoints.Authority -like "*microsoftonline.us*") {
+                    $cloud = 'Government'
+                }
+            }
+            Connect-M365Doc -ClientId $script:tokenRequest.ClientId -ClientSecret $script:tokenRequest.ClientSecret -TenantId $script:tokenRequest.TenantId -Cloud $cloud -Verbose
         } catch {
             Throw "Could not refresh token. $($_.Exception.Message)."
         }
     } elseif ($script:token -and $script:tokenRequest) {
         # Using Interactive
         try {
-            Connect-M365Doc -Force
+            # Determine cloud environment from stored cloud endpoints
+            $cloud = 'Commercial'
+            if ($script:CloudEndpoints) {
+                if ($script:CloudEndpoints.Authority -like "*microsoftonline.us*") {
+                    $cloud = 'Government'
+                }
+            }
+            Connect-M365Doc -Force -Cloud $cloud
         } catch {
             Throw "Could not refresh token. $($_.Exception.Message)."
         }
